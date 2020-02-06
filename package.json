@@ -1,0 +1,31 @@
+{
+  "name": "abc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Giveback007/abc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Giveback007/abc/issues"
+  },
+  "homepage": "https://github.com/Giveback007/abc#readme",
+  "dependencies": {
+    "@giveback007/util-lib": "^0.11.1",
+    "tslib": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/parcel-env": "0.0.0",
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "parcel-bundler": "^1.12.4",
+    "sass": "^1.25.1-test.1",
+    "typescript": "^3.7.5"
+  }
+}
