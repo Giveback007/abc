@@ -1,0 +1,9 @@
+for now all I want is that each day I get a fresh "note-page"
+each day that I have notes gets saved
+I can retrieve the notes from the menu by the date
+
+a note gets marked with a date
+obj: {
+    '09-02-2020': 'here is my string'
+}
+

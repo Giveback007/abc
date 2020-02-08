@@ -1,103 +1,121 @@
-import { StateManager, arrGen, wait, objKeyVals, dictionary } from '../src/index';
-const { log } = console;
+import { StateManager, snackBar, equal, objKeyVals, wait } from '@giveback007/util-lib';
 
-const getElm = (str: string) => document.querySelector(str);
+// -- UTILS -- //
+const elm = (str) => document.querySelector(str);
 
-const disableElm = (elm: Element, condition: boolean) => {
-    if (condition)
-        elm.setAttribute('disabled', 'true');
-    else
-        prev.removeAttribute('disabled');
-}
+const translateRegx: [RegExp, string][] = [];
+const reverseRegx: [RegExp, string][] = [];
 
-const store = new StateManager({
-    perPage: 50,
-    charBaseNum: 0,
-    text: '',
-}, { id: 'main-app-state' });
-
-const textBox = getElm('#text-area') as HTMLInputElement;
-(window as any)['textBox'] = textBox;
-const table = getElm('#table');
-const prev = getElm('#prev');
-const next = getElm('#next');
-
-next.addEventListener('click', () => {
-    const { charBaseNum, perPage } = store.getState();
-    store.setState({ charBaseNum: charBaseNum + perPage })
+objKeyVals({
+    E: '7',
+    T: '𝘓',
+    A: 'Ր', // changed
+    O: 'Ḷ',
+    I: 'Λ',
+    N: 'Γ', // changed
+    S: 'Ɔ', // changed
+    R: 'Ƨ', // changed
+    // H: 'Ϫ', // changed
+    L: 'Ѧ',
+    F: 'Π',
+    G: 'Ͷ',
+    Y: 'Δ',
+}).forEach(({ key: oldVal, val: newVal }, i) => {
+    translateRegx[i] = [new RegExp(oldVal, 'g'), newVal];
+    reverseRegx[i] = [new RegExp(newVal, 'g'), oldVal];
 });
 
-prev.addEventListener('click', () => {
-    const { charBaseNum, perPage } = store.getState();
-    const n = charBaseNum - perPage;
-    store.setState({ charBaseNum: n < 0 ? 0 : n })
-});
-
-store.subscribe((charBaseNum) => {
-    disableElm(prev, !charBaseNum);
-
-    table.innerHTML = '';
-    arrGen(store.getState().perPage).forEach((x, i) => {
-        const n = charBaseNum + i + 1;
-
-        table.innerHTML +=
-            `<div class="item">
-                <span class="number">${n}</span>
-                <div class="character">
-                    <span>${String.fromCharCode(n)}</span>
-                </div>
-            </div>`
-    });
-}, 'charBaseNum');
-
-store.subscribe((text) => {
-    if (text === textBox.value) return;
-    const { selectionStart, selectionEnd } = textBox;
-
-    textBox.value = text;
-    textBox.setSelectionRange(selectionStart, selectionEnd);
-}, 'text')
-
-const convertText = (text: string, keys: dictionary<string>) => {
-    const regxArr: [RegExp, string][] = objKeyVals(keys)
-        .map(({ key: oldVal, val: newVal}) => [new RegExp(oldVal, 'g'), newVal]);
-
-    let newText = text;
-    regxArr.forEach((([regx, newVal]) => newText = newText.replace(regx, newVal)));
+const translate = (text: string, doTranslate: boolean) => {
+    let newText = text;//.toUpperCase();
+    (doTranslate ? translateRegx : reverseRegx)
+        .forEach((([regx, newVal]) => newText = newText.replace(regx, newVal)));
 
     return newText;
 }
 
-textBox.addEventListener('keydown', async (e) => {
-    await wait(0); // allow view to update first
-    const inpElm = e.target;
 
-    if (!(
-        inpElm instanceof HTMLInputElement
+// -- STATE/STORE -- //
+const initState = {
+	text: localStorage.getItem('text') || '',
+	doTranslate: true,
+	menuOpen: false,
+}
+
+const store = new StateManager(initState, { id: 'notes' });
+type State = typeof initState;
+
+
+// -- RENDER -- //
+store.subscribe(renderOnStateChange)
+function renderOnStateChange(s: State, prev: State) {
+    console.log(s, prev);
+    
+    // s.menuOpen
+    if (!equal(s.menuOpen, prev.menuOpen)) {
+        const key = s.menuOpen ? 'remove' : 'add';
+
+        elm('#menu').classList[key]('hide');
+        elm('#on-menu-block').classList[key]('hide');
+    }
+
+    // s.text
+    if (
+        !equal(s.text, prev.text)
         ||
-        inpElm instanceof HTMLTextAreaElement
-    )) return;
+        !equal(s.doTranslate, prev.doTranslate)
+    ) {
+        const textArea = elm('#text-area');
+
+        const start = textArea.selectionStart;
+        const end = textArea.selectionEnd;
+        
+        textArea.value = translate(s.text, s.doTranslate);
+        textArea.setSelectionRange(start, end);
+
+        // s.doTranslate
+        if (!equal(s.doTranslate, prev.doTranslate)) {
+            const doIt = s.doTranslate;
+            snackBar(doIt ? 'Convert text' : 'Regular text');
+            textArea.setAttribute('spellcheck', !doIt);
+
+            elm('#translate').classList[doIt ? 'add' : 'remove']('active');
+        }
+        
+    }
+
+}
 
 
-    const cursorStart = inpElm.selectionStart;
-    const cursorEnd = inpElm.selectionEnd;
+// -- ACTIONS -- //
+const clearText = () => {
+    if (!confirm('Clear Text?')) return;
 
-    const keys = {
-        E: '7',
-        T: '𝘓',
-        A: 'Ր', // changed
-        O: 'Ḷ',
-        I: 'Λ',
-        // N: 'Γ', // changed
-        // S: 'Ɔ', // changed
-        // R: 'Ƨ', // changed
-        // H: 'Ϫ', // changed
-        L: 'Ѧ',
-        F: 'Π',
-        G: 'Ͷ',
-        Y: 'Δ',
-    };
+    snackBar('Cleared');
+    elm('#text-area').focus();
+    store.setState({ text: '', menuOpen: false });
+}
 
-    let newText = convertText(inpElm.value.toUpperCase(), keys);
-    store.setState({ text: newText })
-})
+const copyText = () => {
+	snackBar('Copied');
+	navigator.clipboard.writeText(store.getState().text);
+}
+
+const pasteText = () => {
+	snackBar('Paste');
+	navigator.clipboard.readText().then((text) => store.setState({ text }));
+}
+
+// -- ELEMENTS & LISTENERS -- //
+const textArea = elm('#text-area');
+
+[   ['#clear', clearText], ['#paste', pasteText], ['#copy', copyText],
+    ['#translate', () => store.setState({ doTranslate: !store.getState().doTranslate })],
+    ['#menu-toggle', ()=> store.setState({ menuOpen: !store.getState().menuOpen })],
+    ['#on-menu-block', ()=> store.setState({ menuOpen: false })],
+].forEach(([id, f]) => elm(id).addEventListener('click', f));
+
+textArea.addEventListener('input', () => wait(0)
+    .then(() =>store.setState({ text: textArea.value.toUpperCase() })));
+
+snackBar("Write your text");
+setTimeout(() => textArea.focus(), 100);

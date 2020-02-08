@@ -3,19 +3,19 @@ const objEntries = (obj) => Object.keys(obj).map((key) => [key, obj[key]]);
 const getElm = (str) => document.querySelector(str);
 
 const forwardKeys = {
-        E: '7',
-        T: '𝘓',
-        A: 'Ր', // changed
-        O: 'Ḷ',
-        I: 'Λ',
-        N: 'Γ', // changed
-        S: 'Ɔ', // changed
-        R: 'Ƨ', // changed
-        // H: 'Ϫ', // changed
-        L: 'Ѧ',
-        F: 'Π',
-        G: 'Ͷ',
-        Y: 'Δ',
+	E: '7',
+	T: '𝘓',
+	A: 'Ր', // changed
+	O: 'Ḷ',
+	I: 'Λ',
+	N: 'Γ', // changed
+	S: 'Ɔ', // changed
+	R: 'Ƨ', // changed
+	// H: 'Ϫ', // changed
+	L: 'Ѧ',
+	F: 'Π',
+	G: 'Ͷ',
+	Y: 'Δ',
 }
 
 const state = {
@@ -30,8 +30,10 @@ const state = {
 	activeleyCopy: false,
 }
 
+// do differently
 const textBox = getElm('#text-area');
 textBox.value = state.text;
+// do differently
 
 const clearText = () => {
 	toggleMenu(false);
@@ -89,7 +91,7 @@ const abc = (text = textBox.value) => {
 	const start = textBox.selectionStart;
 	const end = textBox.selectionEnd;
 	
-	const keys = state[state.translate ? 'forwardKeys' : 'reverseKeys']
+	const keys = state[state.translate ? 'forwardKeys' : 'reverseKeys'];
     const regxArr = objEntries(keys)
         .map(([oldVal, newVal]) => [new RegExp(oldVal, 'g'), newVal]);
 
