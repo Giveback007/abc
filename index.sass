@@ -3,10 +3,8 @@
 	margin: 0
 	padding: 0
 
-
 html, body 
 	height: 100%
-
 
 #buttons 
 	width: 100%
@@ -28,7 +26,6 @@ button
 	&:active
 		background-color: #a6a6a6
 
-
 #text-area 
 	width: 100%
 	height: 90%
@@ -38,7 +35,6 @@ button
 	padding: 5px
 	&:focus 
 		outline-width: 0
-
 
 #menu 
 	z-index: 100
@@ -50,11 +46,19 @@ button
 	border: solid 1px grey
 	background: white
 	box-shadow: 3px 3px 2px #888888
+	overflow-y: scroll
+	overflow-x: hidden
+	&::-webkit-scrollbar
+		width: 0.3em
+	&::-webkit-scrollbar-thumb
+		background-color: darkgrey
+		outline: 1px solid slategrey
+	h4
+		text-align: center
 	button 
 		width: 100%
 		height: 50px
 		margin-bottom: 0.5px
-
 
 #on-menu-block 
 	z-index: 99
@@ -66,10 +70,8 @@ button
 	background: black
 	opacity: 0.3
 
-
 .hide 
 	display: none
-
 
 .active 
 	background-color: #a6a6a6
