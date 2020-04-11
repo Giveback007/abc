@@ -1,19 +1,19 @@
-import { snackBar } from '@giveback007/util-lib';
+import { snackBar } from '@giveback007/util-lib/dist/browser';
 const objEntries = (obj) => Object.keys(obj).map((key) => [key, obj[key]]);
 const getElm = (str) => document.querySelector(str);
 
 const forwardKeys = {
 	E: '7',
 	T: '𝘓',
-	A: 'Ր', // changed
-	O: 'Ḷ',
+	// A: 'Ր', // changed
+	// O: 'Ḷ',
 	I: 'Λ',
-	N: 'Γ', // changed
-	S: 'Ɔ', // changed
-	R: 'Ƨ', // changed
+	// N: 'Γ', // changed
+	// S: 'Ɔ', // changed
+	// R: 'Ƨ', // changed
 	// H: 'Ϫ', // changed
 	L: 'Ѧ',
-	F: 'Π',
+	// F: 'Π',
 	G: 'Ͷ',
 	Y: 'Δ',
 }
@@ -27,7 +27,7 @@ const state = {
 	}, { }),
 	translate: true,
 	menuOpen: false,
-	activeleyCopy: false,
+	activelyCopy: false,
 }
 
 // do differently
@@ -54,19 +54,18 @@ const pasteText = () => {
 	navigator.clipboard.readText().then((text) => abc(text));
 }
 
-const toggleTranslate = (bool = !state.translate) => {
-	state.translate = bool;
-	snackBar(bool ? 'Convert text' : 'Regular text');
+const toggleTranslate = (doTranslate = !state.translate) => {
+	state.translate = doTranslate;
+	snackBar(doTranslate ? 'Convert text' : 'Regular text');
 	
-	textBox.setAttribute('spellcheck', !bool);
-	
-	getElm('#translate').classList[bool ? 'add' : 'remove']('active');
+	textBox.setAttribute('spellcheck', !doTranslate);
+	getElm('#translate').classList[doTranslate ? 'add' : 'remove']('active');
 	abc();
 }
 
-const toggleActiveCopy = (bool = !state.activeleyCopy) => {
+const toggleActiveCopy = (bool = !state.activelyCopy) => {
 	// snackBar('works')
-	state.activeleyCopy = bool;
+	state.activelyCopy = bool;
 	const activeCopy = getElm('#active-copy');
 	
 	snackBar(bool ? 'Copy on write on' : 'Copy on write off')
@@ -108,11 +107,11 @@ const abc = (text = textBox.value) => {
 snackBar("Write your text");
 setTimeout(() => textBox.focus(), 100);
 
-textBox.addEventListener('input', () => setTimeout(() => abc(), 0));
-getElm('#clear').addEventListener('click', clearText);
-getElm('#paste').addEventListener('click', pasteText);
-getElm('#copy').addEventListener('click', () => copyText());
-getElm('#translate').addEventListener('click', () => toggleTranslate());
-getElm('#menu-toggle').addEventListener('click', ()=> toggleMenu());
-getElm('#on-menu-block').addEventListener('click', ()=> toggleMenu());
-getElm('#active-copy').addEventListener('click', ()=> toggleActiveCopy());
+textBox.addEventListener('input', () => setTimeout(abc, 0));
+getElm('#clear')		.addEventListener('click', clearText);
+getElm('#paste')		.addEventListener('click', pasteText);
+getElm('#copy')			.addEventListener('click', copyText);
+getElm('#translate')	.addEventListener('click', toggleTranslate);
+getElm('#menu-toggle')	.addEventListener('click', toggleMenu);
+getElm('#on-menu-block').addEventListener('click', toggleMenu);
+// getElm('#active-copy').addEventListener('click', ()=> toggleActiveCopy());
